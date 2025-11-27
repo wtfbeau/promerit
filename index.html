@@ -37,6 +37,10 @@
         --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
         --transition-base: 0.4s var(--ease-out-expo);
         --transition-slow: 0.8s var(--ease-out-expo);
+
+        /* Interactive Spotlight Coordinates */
+        --cursor-x: 50%;
+        --cursor-y: 50%;
       }
 
       *,
@@ -57,6 +61,39 @@
         line-height: 1.6;
         overflow-x: hidden;
       }
+
+      /* UPGRADE 1: Mouse Spotlight */
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+          600px circle at var(--cursor-x) var(--cursor-y),
+          rgba(63, 169, 245, 0.08),
+          transparent 40%
+        );
+        z-index: 1001; /* Overlay pointer events none */
+        pointer-events: none;
+        opacity: 1;
+        transition: opacity 0.3s;
+        mix-blend-mode: screen;
+      }
+
+      /* Accessibility: Reduced Motion */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
+
       img {
         max-width: 100%;
         height: auto;
@@ -82,22 +119,13 @@
         max-width: 1400px;
         margin: 0 auto;
         padding: 0 24px;
+        position: relative;
+        z-index: 2; /* Bring content above spotlight */
       }
       @media (min-width: 768px) {
         .container {
           padding: 0 48px;
         }
-      }
-
-      /* FULL VIEWPORT SECTIONS */
-      .section-viewport {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        position: relative;
-        overflow: hidden;
-        scroll-snap-align: start;
       }
 
       /* ANIMATIONS */
@@ -141,28 +169,10 @@
             0 0 80px rgba(63, 169, 245, 0.4);
         }
       }
-      @keyframes shimmer {
-        0% {
-          background-position: -200% 0;
-        }
-        100% {
-          background-position: 200% 0;
-        }
-      }
       @keyframes fadeInUp {
         from {
           opacity: 0;
           transform: translateY(60px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-      @keyframes fadeInDown {
-        from {
-          opacity: 0;
-          transform: translateY(-40px);
         }
         to {
           opacity: 1;
@@ -179,16 +189,6 @@
           transform: scale(1);
         }
       }
-      @keyframes slideInLeft {
-        from {
-          opacity: 0;
-          transform: translateX(-100px);
-        }
-        to {
-          opacity: 1;
-          transform: translateX(0);
-        }
-      }
       @keyframes slideInRight {
         from {
           opacity: 0;
@@ -197,16 +197,6 @@
         to {
           opacity: 1;
           transform: translateX(0);
-        }
-      }
-      @keyframes rotateIn {
-        from {
-          opacity: 0;
-          transform: rotate(-10deg) scale(0.9);
-        }
-        to {
-          opacity: 1;
-          transform: rotate(0) scale(1);
         }
       }
       @keyframes countPulse {
@@ -251,37 +241,6 @@
           transform: scaleY(1);
         }
       }
-      @keyframes ripple {
-        0% {
-          transform: scale(0.8);
-          opacity: 1;
-        }
-        100% {
-          transform: scale(2.5);
-          opacity: 0;
-        }
-      }
-      @keyframes orbit {
-        from {
-          transform: rotate(0deg) translateX(150px) rotate(0deg);
-        }
-        to {
-          transform: rotate(360deg) translateX(150px) rotate(-360deg);
-        }
-      }
-      @keyframes typing {
-        from {
-          width: 0;
-        }
-        to {
-          width: 100%;
-        }
-      }
-      @keyframes blink {
-        50% {
-          border-color: transparent;
-        }
-      }
       @keyframes particleFloat {
         0% {
           transform: translateY(100vh) translateX(0) scale(0);
@@ -316,15 +275,6 @@
       }
       .stagger.active > *:nth-child(3) {
         animation: fadeInUp 0.8s var(--ease-out-expo) 0.3s forwards;
-      }
-      .stagger.active > *:nth-child(4) {
-        animation: fadeInUp 0.8s var(--ease-out-expo) 0.4s forwards;
-      }
-      .stagger.active > *:nth-child(5) {
-        animation: fadeInUp 0.8s var(--ease-out-expo) 0.5s forwards;
-      }
-      .stagger.active > *:nth-child(6) {
-        animation: fadeInUp 0.8s var(--ease-out-expo) 0.6s forwards;
       }
 
       /* HEADER */
@@ -448,6 +398,14 @@
           linear-gradient(180deg, var(--pm-navy) 0%, var(--pm-black) 100%);
         position: relative;
         overflow: hidden;
+        perspective: 1000px; /* Essential for 3D Tilt */
+      }
+      /* Performance Optimization */
+      .hero-particles,
+      .particle,
+      .hero-dashboard,
+      .logo-track {
+        will-change: transform;
       }
 
       /* Animated particles */
@@ -468,7 +426,6 @@
       .particle:nth-child(1) {
         left: 10%;
         animation: particleFloat 8s linear infinite;
-        animation-delay: 0s;
       }
       .particle:nth-child(2) {
         left: 20%;
@@ -489,31 +446,6 @@
         left: 50%;
         animation: particleFloat 11s linear infinite;
         animation-delay: 3s;
-      }
-      .particle:nth-child(6) {
-        left: 60%;
-        animation: particleFloat 8s linear infinite;
-        animation-delay: 1.5s;
-      }
-      .particle:nth-child(7) {
-        left: 70%;
-        animation: particleFloat 10s linear infinite;
-        animation-delay: 2.5s;
-      }
-      .particle:nth-child(8) {
-        left: 80%;
-        animation: particleFloat 7s linear infinite;
-        animation-delay: 4s;
-      }
-      .particle:nth-child(9) {
-        left: 90%;
-        animation: particleFloat 9s linear infinite;
-        animation-delay: 0.8s;
-      }
-      .particle:nth-child(10) {
-        left: 15%;
-        animation: particleFloat 12s linear infinite;
-        animation-delay: 3.5s;
       }
 
       .hero-orb {
@@ -542,15 +474,6 @@
         bottom: -100px;
         left: -100px;
         animation: floatReverse 15s ease-in-out infinite;
-      }
-      .hero-orb-3 {
-        width: 300px;
-        height: 300px;
-        background: radial-gradient(circle, #60a5fa 0%, transparent 70%);
-        top: 40%;
-        left: 30%;
-        animation: float 10s ease-in-out infinite;
-        animation-delay: -3s;
       }
 
       .hero-content {
@@ -620,7 +543,6 @@
         border-radius: 4px;
         z-index: -1;
       }
-
       .hero-subtitle {
         font-size: clamp(1rem, 1.5vw, 1.2rem);
         font-weight: 300;
@@ -642,11 +564,6 @@
         gap: 20px;
         padding-top: 24px;
         border-top: 1px solid var(--pm-gray-800);
-      }
-      @media (max-width: 640px) {
-        .hero-stats {
-          grid-template-columns: repeat(2, 1fr);
-        }
       }
       .hero-stat {
         text-align: center;
@@ -670,6 +587,7 @@
       .hero-visual {
         display: none;
         animation: slideInRight 1s var(--ease-out-expo) 0.4s both;
+        perspective: 1000px;
       }
       @media (min-width: 1024px) {
         .hero-visual {
@@ -685,24 +603,20 @@
         padding: 24px;
         box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.6),
           inset 0 1px 0 rgba(255, 255, 255, 0.05);
-        animation: float 8s ease-in-out infinite;
+        /* UPGRADE 2: 3D Tilt Basics */
+        transform-style: preserve-3d;
+        transition: transform 0.1s ease-out;
       }
-      .hero-dashboard::before {
-        content: '';
-        position: absolute;
-        inset: -1px;
-        border-radius: 20px;
-        padding: 1px;
-        background: linear-gradient(
-          135deg,
-          rgba(63, 169, 245, 0.5),
-          transparent 40%,
-          rgba(63, 169, 245, 0.3)
-        );
-        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-        mask-composite: exclude;
-        -webkit-mask-composite: xor;
-        pointer-events: none;
+
+      /* Depth for child elements in tilt */
+      .floating-badge,
+      .floating-stat {
+        transform: translateZ(30px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      }
+      .dashboard-metrics,
+      .dashboard-chart {
+        transform: translateZ(10px);
       }
 
       .dashboard-header {
@@ -879,7 +793,9 @@
         align-items: center;
         gap: 12px;
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-        animation: floatReverse 5s ease-in-out infinite;
+        /* Removed float animation to prevent conflict with Tilt logic,
+           or keep it subtle if desired. For pure tilt, best to remove. */
+        /* animation: floatReverse 5s ease-in-out infinite; */
       }
       .floating-stat-icon {
         width: 40px;
@@ -918,7 +834,7 @@
         align-items: center;
         gap: 8px;
         box-shadow: 0 10px 30px var(--pm-blue-glow);
-        animation: float 4s ease-in-out infinite;
+        /* animation: float 4s ease-in-out infinite; */
       }
       .floating-badge svg {
         width: 16px;
@@ -929,7 +845,7 @@
         font-weight: 700;
       }
 
-      /* LOGO MARQUEE */
+      /* LOGOS */
       .logo-section {
         padding: 60px 0;
         background: var(--pm-dark);
@@ -938,23 +854,27 @@
         position: relative;
         overflow: hidden;
       }
-      .logo-section::before,
+      .logo-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 200px;
+        height: 100%;
+        z-index: 10;
+        background: linear-gradient(90deg, var(--pm-dark), transparent);
+        pointer-events: none;
+      }
       .logo-section::after {
         content: '';
         position: absolute;
         top: 0;
+        right: 0;
         width: 200px;
         height: 100%;
         z-index: 10;
-        pointer-events: none;
-      }
-      .logo-section::before {
-        left: 0;
-        background: linear-gradient(90deg, var(--pm-dark), transparent);
-      }
-      .logo-section::after {
-        right: 0;
         background: linear-gradient(270deg, var(--pm-dark), transparent);
+        pointer-events: none;
       }
       .logo-title {
         text-align: center;
@@ -994,7 +914,7 @@
         object-fit: contain;
       }
 
-      /* SERVICES SECTION */
+      /* SERVICES */
       .services-section {
         min-height: 100vh;
         display: flex;
@@ -1008,23 +928,6 @@
           var(--pm-dark);
         position: relative;
       }
-      .services-section::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 0;
-        width: 300px;
-        height: 300px;
-        background: radial-gradient(
-          circle,
-          var(--pm-blue-glow),
-          transparent 70%
-        );
-        filter: blur(100px);
-        opacity: 0.3;
-        transform: translateY(-50%);
-      }
-
       .section-header {
         text-align: center;
         margin-bottom: 60px;
@@ -1088,41 +991,10 @@
         transition: all var(--transition-slow);
         overflow: hidden;
       }
-      .service-card::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(
-          135deg,
-          rgba(63, 169, 245, 0.1),
-          transparent
-        );
-        opacity: 0;
-        transition: opacity var(--transition-base);
-      }
-      .service-card::after {
-        content: '';
-        position: absolute;
-        inset: -1px;
-        border-radius: 20px;
-        padding: 1px;
-        background: linear-gradient(135deg, var(--pm-blue), transparent 50%);
-        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-        mask-composite: exclude;
-        -webkit-mask-composite: xor;
-        opacity: 0;
-        transition: opacity var(--transition-base);
-        pointer-events: none;
-      }
       .service-card:hover {
         transform: translateY(-12px);
         box-shadow: 0 30px 60px -15px rgba(63, 169, 245, 0.2);
       }
-      .service-card:hover::before,
-      .service-card:hover::after {
-        opacity: 1;
-      }
-
       .service-icon {
         width: 64px;
         height: 64px;
@@ -1141,7 +1013,6 @@
         color: var(--pm-white);
         transform: scale(1.1) rotate(5deg);
       }
-
       .service-card h3 {
         font-size: 1.4rem;
         margin-bottom: 12px;
@@ -1157,7 +1028,6 @@
         position: relative;
         z-index: 1;
       }
-
       .service-visual {
         height: 60px;
         margin-bottom: 20px;
@@ -1183,7 +1053,6 @@
       .service-card:hover .service-mini-bar {
         animation: barGrow 0.8s var(--ease-out-expo) forwards;
       }
-
       .service-features {
         display: flex;
         flex-direction: column;
@@ -1207,7 +1076,6 @@
         height: 2px;
         background: var(--pm-blue);
       }
-
       .service-link {
         display: inline-flex;
         align-items: center;
@@ -1232,22 +1100,6 @@
         position: relative;
         overflow: hidden;
       }
-      .why-section::before {
-        content: '';
-        position: absolute;
-        top: 20%;
-        right: -10%;
-        width: 600px;
-        height: 600px;
-        background: radial-gradient(
-          circle,
-          rgba(63, 169, 245, 0.1),
-          transparent 70%
-        );
-        border-radius: 50%;
-        pointer-events: none;
-      }
-
       .why-content {
         display: grid;
         gap: 60px;
@@ -1261,10 +1113,6 @@
           gap: 100px;
         }
       }
-
-      .why-text .section-title {
-        text-align: left;
-      }
       .why-text > p {
         font-size: 1.1rem;
         font-weight: 300;
@@ -1272,7 +1120,6 @@
         line-height: 1.8;
         margin-bottom: 40px;
       }
-
       .why-features {
         display: flex;
         flex-direction: column;
@@ -1318,11 +1165,6 @@
         line-height: 1.6;
       }
 
-      .why-visual {
-        position: relative;
-        display: flex;
-        justify-content: center;
-      }
       .why-dashboard {
         position: relative;
         background: linear-gradient(145deg, var(--pm-gray-900), var(--pm-dark));
@@ -1332,24 +1174,6 @@
         box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.5);
         animation: float 7s ease-in-out infinite;
       }
-      .why-dashboard::before {
-        content: '';
-        position: absolute;
-        inset: -1px;
-        border-radius: 24px;
-        padding: 1px;
-        background: linear-gradient(
-          135deg,
-          rgba(63, 169, 245, 0.4),
-          transparent 50%,
-          rgba(63, 169, 245, 0.2)
-        );
-        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-        mask-composite: exclude;
-        -webkit-mask-composite: xor;
-        pointer-events: none;
-      }
-
       .why-chart-header {
         display: flex;
         justify-content: space-between;
@@ -1371,7 +1195,6 @@
         font-weight: 700;
         color: var(--pm-success);
       }
-
       .why-chart {
         position: relative;
         height: 200px;
@@ -1403,7 +1226,6 @@
         opacity: 0;
         animation: fadeInUp 1s var(--ease-out-expo) 1.5s forwards;
       }
-
       .why-metrics {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -1427,7 +1249,6 @@
         text-transform: uppercase;
         letter-spacing: 0.05em;
       }
-
       .why-floating {
         position: absolute;
         padding: 16px 20px;
@@ -1468,7 +1289,7 @@
         text-transform: uppercase;
       }
 
-      /* RESULTS SECTION */
+      /* RESULTS */
       .results-section {
         min-height: 100vh;
         display: flex;
@@ -1482,7 +1303,6 @@
           var(--pm-dark);
         position: relative;
       }
-
       .results-grid {
         display: grid;
         gap: 32px;
@@ -1492,7 +1312,6 @@
           grid-template-columns: repeat(2, 1fr);
         }
       }
-
       .result-card {
         position: relative;
         background: linear-gradient(
@@ -1509,7 +1328,6 @@
         transform: translateY(-8px);
         box-shadow: 0 30px 60px -15px rgba(63, 169, 245, 0.15);
       }
-
       .result-card-image {
         position: relative;
         height: 200px;
@@ -1534,7 +1352,6 @@
       .result-card:hover .result-card-image img {
         transform: scale(1.1);
       }
-
       .result-card-content {
         padding: 32px;
       }
@@ -1561,7 +1378,6 @@
         line-height: 1.7;
         margin-bottom: 24px;
       }
-
       .result-metrics {
         display: flex;
         gap: 32px;
@@ -1580,9 +1396,108 @@
         color: var(--pm-gray-500);
       }
 
-      /* TESTIMONIAL SECTION */
+      /* UPGRADE 3: ROI CALCULATOR */
+      .calculator-section {
+        padding: 80px 0;
+        background: var(--pm-black);
+      }
+      .calc-container {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 40px;
+        background: var(--pm-gray-900);
+        border: 1px solid var(--pm-gray-700);
+        border-radius: 24px;
+        padding: 40px;
+        margin-bottom: 80px;
+        position: relative;
+        z-index: 2;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      }
+      @media (min-width: 1024px) {
+        .calc-container {
+          grid-template-columns: 1fr 1.2fr;
+          align-items: center;
+        }
+      }
+      .calc-card {
+        background: var(--pm-black);
+        padding: 30px;
+        border-radius: 16px;
+        border: 1px solid var(--pm-gray-700);
+      }
+      .calc-input-group label {
+        font-size: 0.9rem;
+        color: var(--pm-gray-400);
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+      .range-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--pm-white);
+        margin-bottom: 10px;
+      }
+      input[type='range'] {
+        width: 100%;
+        height: 6px;
+        background: var(--pm-gray-700);
+        border-radius: 5px;
+        outline: none;
+        -webkit-appearance: none;
+        margin: 20px 0 40px;
+        cursor: pointer;
+      }
+      input[type='range']::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--pm-blue);
+        cursor: pointer;
+        box-shadow: 0 0 15px var(--pm-blue-glow);
+        transition: transform 0.2s;
+      }
+      input[type='range']::-webkit-slider-thumb:hover {
+        transform: scale(1.2);
+      }
+      .calc-results {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding-top: 30px;
+        border-top: 1px solid var(--pm-gray-800);
+      }
+      @media (min-width: 600px) {
+        .calc-results {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      .calc-result-item span {
+        display: block;
+        font-size: 0.8rem;
+        color: var(--pm-gray-500);
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .highlight {
+        color: var(--pm-white);
+        font-size: 1.8rem;
+        display: block;
+        font-weight: 800;
+      }
+      .highlight-green {
+        color: var(--pm-success);
+        font-size: 1.8rem;
+        display: block;
+        font-weight: 800;
+      }
+
+      /* TESTIMONIAL */
       .testimonial-section {
-        min-height: 100vh;
+        min-height: 80vh;
         display: flex;
         align-items: center;
         padding: 80px 0;
@@ -1602,7 +1517,6 @@
         pointer-events: none;
         opacity: 0.5;
       }
-
       .testimonial-content {
         position: relative;
         z-index: 1;
@@ -1652,9 +1566,9 @@
         opacity: 0.8;
       }
 
-      /* CTA SECTION */
+      /* CTA */
       .cta-section {
-        min-height: 100vh;
+        min-height: 80vh;
         display: flex;
         align-items: center;
         padding: 80px 0;
@@ -1696,7 +1610,6 @@
         border-radius: 50%;
         pointer-events: none;
       }
-
       .cta-content {
         position: relative;
         z-index: 1;
@@ -1825,7 +1738,6 @@
     </style>
   </head>
   <body>
-    <!-- HEADER -->
     <header class="header" id="header">
       <div class="container">
         <nav class="nav-container">
@@ -1861,7 +1773,6 @@
       </div>
     </header>
 
-    <!-- HERO -->
     <section class="hero">
       <div class="hero-particles">
         <div class="particle"></div>
@@ -2017,7 +1928,6 @@
       </div>
     </section>
 
-    <!-- LOGOS -->
     <section class="logo-section">
       <div class="logo-title">
         Trusted by Leading Canadian & International Brands
@@ -2086,7 +1996,6 @@
       </div>
     </section>
 
-    <!-- SERVICES -->
     <section class="services-section reveal" id="services">
       <div class="container">
         <div class="section-header">
@@ -2249,7 +2158,6 @@
       </div>
     </section>
 
-    <!-- WHY PROMERIT -->
     <section class="why-section reveal" id="why">
       <div class="container">
         <div class="why-content">
@@ -2440,7 +2348,6 @@
       </div>
     </section>
 
-    <!-- RESULTS -->
     <section class="results-section reveal" id="results">
       <div class="container">
         <div class="section-header">
@@ -2513,7 +2420,59 @@
       </div>
     </section>
 
-    <!-- TESTIMONIAL -->
+    <section class="calculator-section reveal">
+      <div class="container">
+        <div class="calc-container">
+          <div class="calc-text">
+            <span class="section-eyebrow">Project Your Growth</span>
+            <h2 class="section-title">
+              See Your Potential with <em>ProMerit</em>
+            </h2>
+            <p
+              style="
+                color: var(--pm-gray-400);
+                max-width: 400px;
+                margin-top: 16px;
+              "
+            >
+              Based on our historical data, our clients experience an average of
+              45% growth in their first year of partnership.
+            </p>
+          </div>
+
+          <div class="calc-card">
+            <div class="calc-input-group">
+              <label>Current Monthly Revenue</label>
+              <div class="range-value" id="currentRevenueVal">$50,000</div>
+              <input
+                type="range"
+                id="revenueRange"
+                min="10000"
+                max="500000"
+                step="5000"
+                value="50000"
+              />
+            </div>
+
+            <div class="calc-results">
+              <div class="calc-result-item">
+                <span>Projected 12-Month Revenue</span>
+                <strong id="projectedRevenue" class="highlight"
+                  >$870,000</strong
+                >
+              </div>
+              <div class="calc-result-item">
+                <span>Additional Annual Profit (Est.)</span>
+                <strong id="addedProfit" class="highlight-green"
+                  >+$270,000</strong
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="testimonial-section reveal">
       <div class="container">
         <div class="testimonial-content">
@@ -2542,7 +2501,6 @@
       </div>
     </section>
 
-    <!-- CTA -->
     <section class="cta-section" id="contact">
       <div class="container">
         <div class="cta-content">
@@ -2577,7 +2535,6 @@
       </div>
     </section>
 
-    <!-- FOOTER -->
     <footer class="footer">
       <div class="container">
         <div class="footer-grid">
@@ -2699,7 +2656,7 @@
 
       revealElements.forEach((el) => revealObserver.observe(el));
 
-      // Animate numbers on scroll
+      // Animate numbers on scroll (Simple Counter)
       const animateNumbers = () => {
         document
           .querySelectorAll(
@@ -2719,6 +2676,72 @@
           });
       };
       setTimeout(animateNumbers, 1000);
+
+      // --- NEW UPGRADES ---
+
+      // 1. Mouse Spotlight Effect Logic
+      document.addEventListener('mousemove', (e) => {
+        // Optimization: Use requestAnimationFrame for smoother performance
+        requestAnimationFrame(() => {
+          const x = e.clientX;
+          const y = e.clientY;
+          document.documentElement.style.setProperty('--cursor-x', x + 'px');
+          document.documentElement.style.setProperty('--cursor-y', y + 'px');
+        });
+      });
+
+      // 2. 3D Tilt Effect Logic (Hero Dashboard)
+      const dashboard = document.querySelector('.hero-dashboard');
+      const heroSection = document.querySelector('.hero');
+
+      if (dashboard && heroSection) {
+        heroSection.addEventListener('mousemove', (e) => {
+          if (window.innerWidth < 1024) return; // Disable on mobile
+
+          requestAnimationFrame(() => {
+            const rect = heroSection.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            // Calculate rotation (max 8 degrees for subtle effect)
+            const rotateX = ((y - centerY) / centerY) * -8;
+            const rotateY = ((x - centerX) / centerX) * 8;
+
+            dashboard.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+          });
+        });
+
+        // Reset on mouse leave
+        heroSection.addEventListener('mouseleave', () => {
+          dashboard.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
+        });
+      }
+
+      // 3. ROI Calculator Logic
+      const slider = document.getElementById('revenueRange');
+      const currentVal = document.getElementById('currentRevenueVal');
+      const projectedVal = document.getElementById('projectedRevenue');
+      const profitVal = document.getElementById('addedProfit');
+
+      if (slider) {
+        slider.addEventListener('input', (e) => {
+          const val = parseInt(e.target.value);
+          // Logic: 45% growth per year
+          const annual = val * 12;
+          const growth = annual * 1.45;
+          const difference = growth - annual;
+
+          // Format numbers to currency
+          const format = (num) => '$' + num.toLocaleString();
+
+          currentVal.textContent = format(val);
+          projectedVal.textContent = format(Math.round(growth));
+          profitVal.textContent = '+' + format(Math.round(difference));
+        });
+      }
     </script>
   </body>
 </html>
